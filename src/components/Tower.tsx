@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "../styles/Tower.css";
 
 type Enemy = {
@@ -14,42 +14,36 @@ type TowerProps = {
   range: number;
   damage: number;
   enemies: Enemy[];
-  onHitEnemy: (id: number, damage: number) => void; // callback para aplicar daño
+  onHitEnemy: (id: number, damage: number) => void;
 };
 
 const Tower: React.FC<TowerProps> = ({ x, y, range, damage, enemies, onHitEnemy }) => {
-  const [target, setTarget] = useState<Enemy | null>(null);
+  const target = enemies.reduce<Enemy | null>((closest, enemy) => {
+    const dist = Math.sqrt((enemy.x - x) ** 2 + (enemy.y - y) ** 2);
+    if (dist <= range && (!closest || dist < Math.sqrt((closest.x - x) ** 2 + (closest.y - y) ** 2))) {
+      return enemy;
+    }
+    return closest;
+  }, null);
 
-  // Buscar enemigo dentro del rango
-  useEffect(() => {
-    const inRange = enemies.find(
-      (enemy) =>
-        Math.sqrt((enemy.x * 10 - x) ** 2 + (enemy.y * 10 - y) ** 2) <= range
-    );
-    setTarget(inRange || null);
-  }, [enemies, x, y, range]);
-
-  // Disparar al enemigo objetivo
   useEffect(() => {
     if (target) {
       const interval = setInterval(() => {
-        console.log(`Tower at (${x},${y}) dispara a enemigo ${target.id}`);
         onHitEnemy(target.id, damage);
       }, 1000);
-
       return () => clearInterval(interval);
     }
-  }, [target, damage, x, y, onHitEnemy]);
+  }, [target, damage, onHitEnemy]);
 
   return (
     <div
       className="tower"
       style={{
-        left: x,
-        top: y,
+        left: `${(x / 100) * 100}%`,
+        top: `${(y / 100) * 100}%`,
       }}
     >
-      T
+      🏰
     </div>
   );
 };

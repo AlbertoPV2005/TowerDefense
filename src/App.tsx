@@ -18,20 +18,25 @@ const App: React.FC = () => {
 
   // Cuando un enemigo muere
   const handleEnemyDeath = () => {
-    setEnemiesRemaining((prev) => Math.max(prev - 1, 0));
-    setMoney((prev) => prev + 10); // recompensa por enemigo
-    if (enemiesRemaining - 1 === 0) {
-      setWaveStarted(false); // termina la oleada
-    }
+    setEnemiesRemaining(prev => {
+      const newCount = Math.max(prev - 1, 0);
+      if (newCount === 0) {
+        setWaveStarted(false);
+      }
+      return newCount;
+    });
+    setMoney(prev => prev + 10);
   };
 
-  // Cuando un enemigo llega al final del camino
   const handleEnemyEscape = () => {
-    setHealth((prev) => Math.max(prev - 5, 0));
-    setEnemiesRemaining((prev) => Math.max(prev - 1, 0));
-    if (enemiesRemaining - 1 === 0) {
-      setWaveStarted(false);
-    }
+    setHealth(prev => Math.max(prev - 5, 0));
+    setEnemiesRemaining(prev => {
+      const newCount = Math.max(prev - 1, 0);
+      if (newCount === 0) {
+        setWaveStarted(false);
+      }
+      return newCount;
+    });
   };
 
   return (

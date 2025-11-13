@@ -1,49 +1,31 @@
-/* estilos/GameUI.css */
-
 .game-ui {
   position: absolute;
-  top: 0; /* Arriba del todo */
-  left: 0;
-  width: 100%; /* Ocupa todo el ancho */
-  display: flex;
-  justify-content: space-around; /* Espaciado entre elementos */
-  align-items: center;
-  background: rgba(30, 30, 47, 0.9); /* Fondo semitransparente */
-  color: #fff;
-  padding: 10px 0;
-  font-family: 'Press Start 2P', cursive;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
   font-size: 14px;
-  z-index: 999; /* Por encima del mapa */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-}
-
-.stats {
-  display: flex;
-  gap: 20px; /* Espacio entre las estadísticas */
 }
 
 .stats p {
-  margin: 0;
+  margin: 5px 0;
 }
 
 button {
-  background: #ff4757;
-  color: #fff;
-  font-size: 14px;
-  font-weight: bold;
-  padding: 8px 14px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-button:hover:not(:disabled) {
-  background: #ff6b81;
-  transform: scale(1.05);
+  font-size: 14px;
 }
 
 button:disabled {
-  background: #555;
+  background-color: #888;
   cursor: not-allowed;
 }

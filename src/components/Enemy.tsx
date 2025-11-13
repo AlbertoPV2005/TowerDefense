@@ -8,16 +8,16 @@ type EnemyProps = {
   hp: number;
 };
 
-const Enemy: React.FC<EnemyProps> = ({ id, x, y, hp }) => {
+const Enemy: React.FC<EnemyProps> = ({x, y, hp }) => {
   return (
     <div
       className="enemy"
       style={{
-        left: x * 10,
-        top: y * 10,
+        left: `${(x / 100) * 100}%`,
+        top: `${(y / 100) * 100}%`,
       }}
     >
-      👾{id} | ❤️{hp}
+      ❤️{hp}
     </div>
   );
 };
