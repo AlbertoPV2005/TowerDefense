@@ -30,8 +30,8 @@ function drawSegment(path: [number, number][], startX: number, startY: number, e
 function generatePath(): [number, number][] {
   const path: [number, number][] = [];
   // Empieza un poco más abajo
-  let x = 0;
-  let y = 20;
+  const x = 0;
+  const y = 20;
 
   // 1er segmento horizontal
   drawSegment(path, x, y, 70, y);

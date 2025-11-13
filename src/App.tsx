@@ -1,13 +1,14 @@
-//import React from 'react';
 import Map from './components/Map';
+import GameUI from './components/GameUI';
+import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <h1>🛡️ Tower Defense</h1>
+    <div className="game-container">
       <Map />
+      <GameUI />
     </div>
   );
-}
+};
 
 export default App;

@@ -1,0 +1,49 @@
+/* estilos/GameUI.css */
+
+.game-ui {
+  position: absolute;
+  top: 0; /* Arriba del todo */
+  left: 0;
+  width: 100%; /* Ocupa todo el ancho */
+  display: flex;
+  justify-content: space-around; /* Espaciado entre elementos */
+  align-items: center;
+  background: rgba(30, 30, 47, 0.9); /* Fondo semitransparente */
+  color: #fff;
+  padding: 10px 0;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 14px;
+  z-index: 999; /* Por encima del mapa */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.stats {
+  display: flex;
+  gap: 20px; /* Espacio entre las estadísticas */
+}
+
+.stats p {
+  margin: 0;
+}
+
+button {
+  background: #ff4757;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #ff6b81;
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
