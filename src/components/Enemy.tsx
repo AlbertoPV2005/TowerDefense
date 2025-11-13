@@ -13,11 +13,11 @@ const Enemy: React.FC<EnemyProps> = ({ id, x, y, hp }) => {
     <div
       className="enemy"
       style={{
-        left: x * 10, // ajusta según el tamaño de celda
+        left: x * 10,
         top: y * 10,
       }}
     >
-      {hp}
+      👾{id} | ❤️{hp}
     </div>
   );
 };
