@@ -1,11 +1,17 @@
 .tower {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background-color: blue;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #2196f3, #0d47a1);
   color: white;
   font-size: 14px;
   text-align: center;
   border-radius: 50%;
   transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px rgba(0, 0, 255, 0.6);
+  transition: transform 0.3s ease;
+}
+
+.tower:hover {
+  transform: translate(-50%, -50%) scale(1.2);
 }

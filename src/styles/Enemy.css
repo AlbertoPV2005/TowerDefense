@@ -1,10 +1,10 @@
 .enemy {
   position: absolute;
-  width: 1.5%; /* proporcional al mapa */
-  height: 1.5%; /* proporcional al mapa */
-  background-color: red;
+  width: 1.8%;
+  height: 1.8%;
+  background: radial-gradient(circle, #ff4d4d, #b30000);
   color: white;
-  font-size: 0.8vw; /* escala con pantalla */
+  font-size: 0.8vw;
   text-align: center;
   border-radius: 50%;
   transform: translate(-50%, -50%);
@@ -12,4 +12,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.6); }
+  50% { box-shadow: 0 0 16px rgba(255, 0, 0, 0.9); }
+  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.6); }
 }

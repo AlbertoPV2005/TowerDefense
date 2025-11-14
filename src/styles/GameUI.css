@@ -2,27 +2,33 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 .stats p {
-  margin: 5px 0;
+  margin: 6px 0;
 }
 
 button {
   margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #4caf50;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #66bb6a, #388e3c);
 }
 
 button:disabled {
