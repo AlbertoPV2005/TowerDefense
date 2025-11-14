@@ -3,7 +3,7 @@ import Map from "./Map";
 import Tower from "./Tower";
 import Enemy from "./Enemy";
 import GameUI from "./GameUI";
-import { generatePath, mapLayout } from "../utils/MapUtils"; // extrae lógica de path
+import { generatePath, mapLayout } from "../utils/MapUtils";
 import type { CellType } from "../types";
 
 const { pathCoords } = generatePath();
