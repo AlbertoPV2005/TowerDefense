@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/Map.css";
 import type { CellType } from "../types";
 import Tower from "./Tower";
 import Enemy from "./Enemy";
+import StaticMap from "./StaticMap"; // nuevo componente para el mapa estático
 
-const gridSize = 100; // número de celdas por lado
+const gridSize = 100;
+const pathRadius = 3;
 
-// Generar camino continuo
-function generatePath(): [number, number][] {
-  const path: [number, number][] = [];
+function generatePath() {
+  const pathCells = new Set<string>();
+  const pathCoords: [number, number][] = [];
+
   const segments: [number, number][] = [
     [0, 20],
     [70, 20],
@@ -17,31 +20,50 @@ function generatePath(): [number, number][] {
     [30, gridSize - 1]
   ];
 
+  const addCell = (x: number, y: number) => {
+    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+      pathCells.add(`${x},${y}`);
+    }
+  };
+
   for (let i = 0; i < segments.length - 1; i++) {
     const [sx, sy] = segments[i];
     const [ex, ey] = segments[i + 1];
+    const dx = ex - sx;
+    const dy = ey - sy;
+    const steps = Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) * 2); // más resolución
+    const stepX = dx / steps;
+    const stepY = dy / steps;
 
-    if (sx === ex) {
-      const step = sy < ey ? 1 : -1;
-      for (let y = sy; y !== ey + step; y += step) {
-        path.push([sx, y]);
+    for (let s = 0; s <= steps; s++) {
+      const cx = Math.round(sx + s * stepX);
+      const cy = Math.round(sy + s * stepY);
+
+      if (!pathCoords.some(([px, py]) => px === cx && py === cy)) {
+        pathCoords.push([cx, cy]);
       }
-    } else {
-      const step = sx < ex ? 1 : -1;
-      for (let x = sx; x !== ex + step; x += step) {
-        path.push([x, sy]);
+
+      for (let ox = -pathRadius; ox <= pathRadius; ox++) {
+        for (let oy = -pathRadius; oy <= pathRadius; oy++) {
+          if (ox * ox + oy * oy <= pathRadius * pathRadius) {
+            addCell(cx + ox, cy + oy);
+          }
+        }
       }
     }
   }
 
-  return path;
+  return {
+    pathCoords,
+    pathCells: Array.from(pathCells).map(c => c.split(",").map(Number) as [number, number])
+  };
 }
 
-const pathCoords = generatePath();
+const { pathCoords, pathCells } = generatePath();
 
 const mapLayout: CellType[][] = Array.from({ length: gridSize }, (_, y) =>
   Array.from({ length: gridSize }, (_, x) =>
-    pathCoords.some(([px, py]) => px === x && py === y) ? "path" : "grass"
+    pathCells.some(([px, py]) => px === x && py === y) ? "path" : "grass"
   )
 );
 
@@ -53,25 +75,28 @@ type MapProps = {
 
 const Map: React.FC<MapProps> = ({ waveStarted, onEnemyDeath, onEnemyEscape }) => {
   const [towers, setTowers] = useState<{ x: number; y: number }[]>([]);
-  const [enemies, setEnemies] = useState<{ id: number; x: number; y: number; hp: number; pathIndex: number }[]>([]);
+  const [enemies, setEnemies] = useState<
+    { id: number; x: number; y: number; hp: number; pathIndex: number }[]
+  >([]);
 
-  // Spawnear enemigos cada 1.5 segundos
+  const enemiesRef = useRef<typeof enemies>([]);
+  enemiesRef.current = enemies;
+
   useEffect(() => {
     if (waveStarted) {
-      setEnemies([]); // limpiar enemigos previos
+      setEnemies([]);
       let count = 0;
       const spawnInterval = setInterval(() => {
         if (count < 10) {
-          setEnemies(prev => [
-            ...prev,
-            {
-              id: count + 1,
-              x: pathCoords[0][0],
-              y: pathCoords[0][1],
-              hp: 50,
-              pathIndex: 0
-            }
-          ]);
+          const newEnemy = {
+            id: count + 1,
+            x: pathCoords[0][0],
+            y: pathCoords[0][1],
+            hp: 50,
+            pathIndex: 0
+          };
+          enemiesRef.current = [...enemiesRef.current, newEnemy];
+          setEnemies([...enemiesRef.current]);
           count++;
         } else {
           clearInterval(spawnInterval);
@@ -81,60 +106,74 @@ const Map: React.FC<MapProps> = ({ waveStarted, onEnemyDeath, onEnemyEscape }) =
     }
   }, [waveStarted]);
 
-  // Movimiento de enemigos siguiendo el camino
   useEffect(() => {
-    const moveInterval = setInterval(() => {
-      setEnemies(prev =>
-        prev.flatMap(enemy => {
-          if (enemy.pathIndex < pathCoords.length - 1) {
-            const nextIndex = enemy.pathIndex + 1;
-            const [nx, ny] = pathCoords[nextIndex];
-            return { ...enemy, x: nx, y: ny, pathIndex: nextIndex };
-          } else {
-            onEnemyEscape();
-            return [];
-          }
-        })
-      );
-    }, 500);
-    return () => clearInterval(moveInterval);
-  }, [onEnemyEscape]);
+    if (!waveStarted) return;
+
+    let animationFrame: number;
+    const speed = 0.15;
+
+    const animate = () => {
+      const updated: typeof enemiesRef.current = [];
+
+      for (const enemy of enemiesRef.current) {
+        const targetIndex = enemy.pathIndex + 1;
+        if (targetIndex >= pathCoords.length) {
+          onEnemyEscape();
+          continue;
+        }
+
+        const [tx, ty] = pathCoords[targetIndex];
+        const dx = tx - enemy.x;
+        const dy = ty - enemy.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist <= speed) {
+          updated.push({ ...enemy, x: tx, y: ty, pathIndex: targetIndex });
+        } else {
+          updated.push({
+            ...enemy,
+            x: enemy.x + (dx / dist) * speed,
+            y: enemy.y + (dy / dist) * speed
+          });
+        }
+      }
+
+      enemiesRef.current = updated;
+      setEnemies([...updated]);
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [waveStarted, onEnemyEscape]);
 
   const handleHitEnemy = (id: number, damage: number) => {
-    setEnemies(prev =>
-      prev.flatMap(enemy => {
-        if (enemy.id === id) {
-          const newHp = enemy.hp - damage;
-          if (newHp <= 0) {
-            onEnemyDeath();
-            return [];
-          }
-          return { ...enemy, hp: newHp };
+    const updated = enemiesRef.current.flatMap(enemy => {
+      if (enemy.id === id) {
+        const newHp = enemy.hp - damage;
+        if (newHp <= 0) {
+          onEnemyDeath();
+          return [];
         }
-        return enemy;
-      })
-    );
+        return { ...enemy, hp: newHp };
+      }
+      return enemy;
+    });
+    enemiesRef.current = updated;
+    setEnemies([...updated]);
   };
 
   const handleCellClick = (x: number, y: number, cell: CellType) => {
     if (cell === "grass") {
-      setTowers([...towers, { x, y }]);
+      setTowers(prev => [...prev, { x, y }]);
     } else {
       alert("No puedes colocar una torre en el camino de los enemigos!");
     }
   };
 
   return (
-    <div className="map">
-      {mapLayout.map((row, y) =>
-        row.map((cell, x) => (
-          <div
-            key={`${x}-${y}`}
-            className={`cell ${cell}`}
-            onClick={() => handleCellClick(x, y, cell)}
-          />
-        ))
-      )}
+    <>
+      <StaticMap mapLayout={mapLayout} onCellClick={handleCellClick} />
 
       {towers.map((tower, index) => (
         <Tower
@@ -151,7 +190,7 @@ const Map: React.FC<MapProps> = ({ waveStarted, onEnemyDeath, onEnemyEscape }) =
       {enemies.map(enemy => (
         <Enemy key={enemy.id} {...enemy} />
       ))}
-    </div>
+    </>
   );
 };
 

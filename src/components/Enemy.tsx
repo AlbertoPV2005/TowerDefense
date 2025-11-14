@@ -8,13 +8,15 @@ type EnemyProps = {
   hp: number;
 };
 
-const Enemy: React.FC<EnemyProps> = ({x, y, hp }) => {
+const Enemy: React.FC<EnemyProps> = ({ x, y, hp }) => {
   return (
     <div
       className="enemy"
       style={{
-        left: `${(x / 100) * 100}%`,
-        top: `${(y / 100) * 100}%`,
+        position: "absolute",
+        left: `${(x / 100) * 100}%`, // ajustado al grid
+        top: `${(y / 100) * 100}%`,  // ajustado al grid
+        transform: "translate(-50%, -50%)" // centrar el enemigo
       }}
     >
       ❤️{hp}
